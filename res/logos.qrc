@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="tf_logo">
+    <file>img/tf.png</file>
+  </qresource>
+  <qresource prefix="marun_logo">
+    <file>img/marun.png</file>
+  </qresource>
+</RCC>
