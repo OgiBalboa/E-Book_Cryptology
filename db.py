@@ -1,4 +1,4 @@
-import pyrebase
+import firebase
 import os
 from cryptography.fernet import Fernet
 class db:
@@ -13,7 +13,7 @@ class db:
 			"appId": "1:840842015753:web:c20cb7ff67f077d07cf4d8",
 			"measurementId": "G-Z2Z9YXSYWX"
 		  }
-		self.firebase = pyrebase.initialize_app(self.config)
+		self.firebase = firebase.Firebase(self.config)
 		self.storage = self.firebase.storage()
 		self.auth = self.firebase.auth()
 	

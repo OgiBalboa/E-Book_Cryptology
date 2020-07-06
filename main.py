@@ -11,6 +11,7 @@ from auth import Ui_MainWindow
 from subprocess import call
 from db import db,permission
 import os
+import firebase
 from pylocker import ServerLocker
 from cryptography.fernet import Fernet
 if permission() == False:
