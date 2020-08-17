@@ -7,7 +7,6 @@ E-book okuyucu uygulama Lector ' a teşekkürlerimizle.
 Tarih : 05.06.2020
 """
 from PyQt5 import QtCore, QtGui, QtWidgets,uic
-from auth import Ui_MainWindow
 from subprocess import call
 from db import db,permission
 import os
@@ -36,7 +35,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self.register_frame.setVisible(True)
         self.signIn_frame.setHidden(True)
     def check_inputs(self,hint = None):
-        if self.pass_input.text() == "":
+        if self.password_input.text() == "":
             return True
         if hint == "signin" and len(self.password_input.text()) > 5 :
             return True
@@ -51,7 +50,7 @@ class MainMenu(QtWidgets.QMainWindow):
     def submit(self):
         if self.check_inputs(hint=  "signin") == False:
             return False
-        elif self.pass_input.text() == "":
+        elif self.password_input.text() == "":
             email ="170216009@gmail.com"
             password = "gfb.1907"
         else:
@@ -71,7 +70,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self.code = code
         print(db.auth.current_user)
         db.database.child("/books/tasit_mekatronik").set(
-                {"code":code},token=db.user['localId']
+                {"code":code},token=db.user['idToken']
                 )
         print(db.database.child("/books/tasit_mekatronik").get())
 if __name__ == "__main__":
