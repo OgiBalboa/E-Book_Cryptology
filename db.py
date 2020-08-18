@@ -32,6 +32,7 @@ class db:
 		cred = credentials.Certificate('marun-bks.json')
 		self.app = firebase_admin.initialize_app(cred,config)
 		self.books = db_.reference("books")
+		self.st_books = db_.reference("books/st_books")
 		self.students = db_.reference("students")
 		self.codes = db_.reference("codes")
 		self.storage = storage.bucket()
