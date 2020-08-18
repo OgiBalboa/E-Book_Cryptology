@@ -4,32 +4,22 @@ import firebase
 import firebase_admin
 from firebase_admin import credentials,storage,auth
 from firebase_admin import db as db_
-
+import sys
 # Fetch the service account key JSON file contents
 
 # Initialize the app with a service account, granting admin privileges
 import time
-
+sys.path.append(".env")
+from config import config
 
 class db:
 	def __init__(self):
-		
-		config = {
-			"apiKey": "AIzaSyACtVeNXkw53Rb2yMHiGWxPRQx9DTseSiQ",
-			"authDomain": "marun-bks.firebaseapp.com",
-			"databaseURL": "https://marun-bks.firebaseio.com",
-			"projectId": "marun-bks",
-			"storageBucket": "marun-bks.appspot.com",
-			"messagingSenderId": "840842015753",
-			"appId": "1:840842015753:web:c20cb7ff67f077d07cf4d8",
-			"measurementId": "G-Z2Z9YXSYWX"
-		  }
-		
+
+		cred = credentials.Certificate('.env/marun-bks.json')
 		self.firebase = firebase.Firebase(config)
 		#self.storage = self.firebase.storage()
 		self.auth = self.firebase.auth()
 		self.user = None
-		cred = credentials.Certificate('marun-bks.json')
 		self.app = firebase_admin.initialize_app(cred,config)
 		self.books = db_.reference("books")
 		self.st_books = db_.reference("books/st_books")
@@ -50,7 +40,7 @@ class db:
 def permission(db):
 	key = b'pRmgMa8T0INjEAfksaq2aafzoZXEuwKI7wDe4c1F8AY='
 	cipher_suite = Fernet(key)
-	with open('permission.bin', 'rb') as file_object:
+	with open('.env/permission.bin', 'rb') as file_object:
 		for line in file_object:
 			encryptedpwd = line
 	uncipher_text = (cipher_suite.decrypt(encryptedpwd))
