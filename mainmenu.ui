@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>755</width>
-    <height>561</height>
+    <height>569</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -64,13 +64,13 @@
      <rect>
       <x>120</x>
       <y>140</y>
-      <width>541</width>
+      <width>571</width>
       <height>351</height>
      </rect>
     </property>
     <property name="minimumSize">
      <size>
-      <width>402</width>
+      <width>0</width>
       <height>0</height>
      </size>
     </property>
@@ -80,6 +80,27 @@
       <height>16777215</height>
      </size>
     </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::SingleSelection</enum>
+    </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectRows</enum>
+    </property>
+    <property name="showGrid">
+     <bool>true</bool>
+    </property>
+    <property name="sortingEnabled">
+     <bool>false</bool>
+    </property>
+    <attribute name="horizontalHeaderMinimumSectionSize">
+     <number>50</number>
+    </attribute>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>142</number>
+    </attribute>
     <column>
      <property name="text">
       <string>Kitap / Belge Adı</string>
@@ -101,19 +122,6 @@
      </property>
     </column>
    </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>500</y>
-      <width>501</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Açmak istediğiniz belgeye çift tıklayınız.</string>
-    </property>
-   </widget>
    <widget class="QFrame" name="auth_frame">
     <property name="enabled">
      <bool>true</bool>
@@ -121,9 +129,9 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>110</y>
+      <y>100</y>
       <width>691</width>
-      <height>421</height>
+      <height>431</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -153,7 +161,7 @@
         <x>20</x>
         <y>20</y>
         <width>271</width>
-        <height>231</height>
+        <height>232</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -243,10 +251,10 @@ color: rgb(0, 0, 127);</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>150</x>
+       <x>120</x>
        <y>10</y>
-       <width>371</width>
-       <height>371</height>
+       <width>471</width>
+       <height>381</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -264,10 +272,10 @@ color: rgb(0, 0, 127);</string>
      <widget class="QWidget" name="layoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>100</x>
         <y>20</y>
         <width>271</width>
-        <height>271</height>
+        <height>288</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -338,8 +346,8 @@ color: rgb(0, 0, 127);</string>
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>300</y>
+        <x>130</x>
+        <y>310</y>
         <width>211</width>
         <height>41</height>
        </rect>
@@ -384,7 +392,7 @@ color: rgb(0, 0, 127);</string>
        <rect>
         <x>60</x>
         <y>350</y>
-        <width>241</width>
+        <width>351</width>
         <height>16</height>
        </rect>
       </property>
@@ -394,13 +402,13 @@ color: rgb(0, 0, 127);</string>
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>230</x>
       <y>110</y>
       <width>351</width>
-      <height>25</height>
+      <height>27</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -423,11 +431,24 @@ color: rgb(0, 0, 127);</string>
      </item>
     </layout>
    </widget>
+   <widget class="QPushButton" name="openbook_btn">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>500</y>
+      <width>221</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Kitabı Aç</string>
+    </property>
+   </widget>
+   <zorder>layoutWidget</zorder>
    <zorder>label</zorder>
    <zorder>label_2</zorder>
    <zorder>tableWidget</zorder>
-   <zorder>label_3</zorder>
-   <zorder></zorder>
+   <zorder>openbook_btn</zorder>
    <zorder>auth_frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -436,7 +457,7 @@ color: rgb(0, 0, 127);</string>
      <x>0</x>
      <y>0</y>
      <width>755</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -444,7 +465,7 @@ color: rgb(0, 0, 127);</string>
  </widget>
  <resources>
   <include location="res/logos.qrc"/>
-  <include location="../../../../../../../../Program Files (x86)/Qt Designer/res/logos.qrc"/>
+  <include location="res/logos.qrc"/>
  </resources>
  <connections/>
 </ui>
