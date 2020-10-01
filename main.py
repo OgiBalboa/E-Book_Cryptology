@@ -4,6 +4,8 @@ Bölümü için geliştirilmiştir. E-book kitapları için şifreleme sistemidi
 @yazar: ogibalboa
 Tarih : 05.06.2020
 """
+import sys
+sys.path.append("bin")
 from PyQt5 import QtCore, QtGui, QtWidgets,uic
 from subprocess import call
 import datetime
@@ -11,6 +13,9 @@ from db import db,permission
 import os
 from pylocker import ServerLocker
 from cryptography.fernet import Fernet
+import logos_rc
+from auth import AuthMenu
+from admin_panel import AdminPanel
 db = db()
 if permission(db) == False:
     exit()
@@ -26,71 +31,43 @@ class Book:
 class MainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainMenu,self).__init__()
-        uic.loadUi('mainmenu.ui',self)
-        #self.setupUi(window)
-        self.submit_button.clicked.connect(self.submit)
-        self.register_button.clicked.connect(self.register_page)
-        self.register_frame.setHidden(True)
-        self.reg_submit_button.clicked.connect(self.register)
-        self.reg_cancel_button.clicked.connect(self.back)
+        uic.loadUi('ui/mainmenu.ui',self)
+        self.admin_panel = None
+        self.email = ""
+        self.no = 0
+        self.password = ""
         self.add_book_btn.clicked.connect(lambda: self.add_book(self.code_input.text()))
         self.openbook_btn.clicked.connect(self.open_book)
-    def back(self):
-        self.register_frame.setHidden(True)
-        self.signIn_frame.setHidden(False)
-    def register_page(self):
-        self.register_frame.setVisible(True)
-        self.signIn_frame.setHidden(True)
-    def check_inputs(self,hint = None):
-        if self.password_input.text() == "":
-            return True
-        if hint == "signin" and len(self.password_input.text()) > 5 :
-            return True
-        elif hint == "register" and len(self.reg_password_input.text()) > 5:
-            self.admin_key = db.download_key()[0]
-            if self.register_key.text() == self.admin_key:
-                return True
-            else:
-                return False
-        else :
-            return False
+        self.open_admin_panel_btn.clicked.connect(self.open_admin_panel)
+        self.refresh_btn.clicked.connect(self.update_library)
+        self.open_admin_panel_btn.hide()
+        self.admin = False
+        self.db = db
     def submit(self):
-        if self.check_inputs(hint=  "signin") == False:
-            return False
-        elif self.password_input.text() == "":
-            self.email ="170216009@gmail.com"
-            self.password = "gfb.1907"
-            self.no = "170216009"
-        else:
-                        self.no = self.username_input.text()
-                        self.email = self.username_input.text() + "@gmail.com"
-                        self.password = self.password_input.text()
         if db.sign(email =self.email ,password =self.password) == None:
-            self.auth_frame.hide()
-            
-            for book in db.students.child(self.no).child("st_books").get().items():
-                info = db.books.child(book[0]).get()
-                if info == None:
-                    continue
-                date = book[1]
-                library.update({book:Book(info["name"],info["supervisor"],info["lecture"],
-                                         date)})
-            self.check_library()
-            
-    def register(self):
-        if self.check_inputs(hint=  "register") == False:
-            print("olmadi")
+            user_info = db.students.child(self.no).get()
+            if user_info["secret"] == "admin":
+                self.admin = True
+                self.open_admin_panel_btn.show()
+                self.update_library()
 
-            return False
-        email = self.reg_username_input.text() + "@gmail.com"
-        print(db.register(email = email ,password=self.reg_password_input.text()))
     def open_book(self):
         name = self.tableWidget.selectedItems()[0].data(0)+".epub"
         cpath = os.getcwd()
         path = os.path.join(cpath,"res","lib",name)
         print(path)
         os.system('sumatra -restrict -view "single page" "' + path +'"')
-        
+    def update_library(self):
+        for book in db.students.child(self.no).child("st_books").get().items():
+
+            info = db.books.child(book[0]).get()
+            if info == None:
+                continue
+            print(book)
+            date = book[1]
+            library.update({book: Book(info["name"], info["supervisor"], info["lecture"],
+                                       date)})
+        self.check_library()
     def add_book(self,code):
         for item in db.codes.order_by_child('code').equal_to(code).get().items():
             name = item[1]["c_book"]
@@ -110,11 +87,17 @@ class MainMenu(QtWidgets.QMainWindow):
             self.tableWidget.setItem(row,1,QtWidgets.QTableWidgetItem(book.lecture))
             self.tableWidget.setItem(row,2,QtWidgets.QTableWidgetItem(book.supervisor))
             self.tableWidget.setItem(row,3,QtWidgets.QTableWidgetItem(book.date))
+    def open_admin_panel(self):
+        self.admin_panel.show()
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("fusion")
+
     menu = MainMenu()
+    auth = AuthMenu(menu)
+    admin_panel = AdminPanel(menu)
+    menu.admin_panel = admin_panel
     #ui = Auth(mainwin)
-    menu.show()
+    auth.show()
     sys.exit(app.exec_())

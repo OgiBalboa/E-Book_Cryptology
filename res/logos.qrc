@@ -2,6 +2,13 @@
   <qresource prefix="tf_logo">
     <file>img/tf.png</file>
   </qresource>
+  <qresource prefix="book">
+    <file>img/mail.png</file>
+    <file>img/add_book.png</file>
+    <file>img/reader.png</file>
+    <file>img/shelf.png</file>
+    <file>img/book.png</file>
+  </qresource>
   <qresource prefix="buttons">
     <file>img/repeat.png</file>
   </qresource>
