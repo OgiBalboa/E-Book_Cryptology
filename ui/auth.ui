@@ -18,7 +18,7 @@
     <normaloff>:/marun_logo/img/marun.png</normaloff>:/marun_logo/img/marun.png</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(210, 213, 228);</string>
+   <string notr="true">background-color: rgb(215, 220, 232);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QFrame" name="auth_frame">

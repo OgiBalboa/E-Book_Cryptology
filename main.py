@@ -16,18 +16,14 @@ from cryptography.fernet import Fernet
 import logos_rc
 from auth import AuthMenu
 from admin_panel import AdminPanel
+from book import Book
 db = db()
 if permission(db) == False:
     exit()
 #lock = ServerLocker(password = 
 global library
 library = {}
-class Book:
-    def __init__(self,name,supervisor,lecture,date):
-        self.name = name
-        self.supervisor = supervisor
-        self.lecture = lecture
-        self.date = date
+
 class MainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainMenu,self).__init__()
@@ -40,6 +36,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self.openbook_btn.clicked.connect(self.open_book)
         self.open_admin_panel_btn.clicked.connect(self.open_admin_panel)
         self.refresh_btn.clicked.connect(self.update_library)
+
         self.open_admin_panel_btn.hide()
         self.admin = False
         self.db = db

@@ -10,6 +10,18 @@
     <height>605</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>745</width>
+    <height>605</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>745</width>
+    <height>605</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Marun BKS</string>
   </property>
