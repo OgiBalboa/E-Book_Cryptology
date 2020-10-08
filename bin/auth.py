@@ -21,7 +21,7 @@ class AuthMenu(QtWidgets.QMainWindow):
         self.register_frame.setHidden(True)
         self.reg_submit_button.clicked.connect(self.register)
         self.reg_cancel_button.clicked.connect(self.back)
-
+        self.dialog = AuthDialog()
     def back(self):
         self.register_frame.setHidden(True)
         self.auth_frame.setHidden(False)
@@ -50,17 +50,33 @@ class AuthMenu(QtWidgets.QMainWindow):
         elif self.password_input.text() == "":
             self.main.email = "170216009@gmail.com"
             self.main.password = "gfb.1907"
-            self.main.no = "170216009"
+            #self.main.no = "170216009"
+            for items in self.main.db.students.order_by_child('email').equal_to(self.main.email).get().keys():
+                self.main.no = items
         else:
             self.main.no = self.username_input.text()
             self.main.email = self.username_input.text() + "@gmail.com"
             self.main.password = self.password_input.text()
         self.close()
-        self.main.submit()
-        self.main.show()
+        if self.main.db.sign(email=self.main.email, password=self.main.password) == None:
+            self.main.submit()
+            self.main.show()
+        else: self.dialog.show()
+
     def register(self):
         if self.check_inputs(hint="register") == False:
             print("olmadi")
             return False
         email = self.reg_username_input.text() + "@gmail.com"
         print(db.register(email=email, password=self.reg_password_input.text()))
+
+class AuthDialog(QtWidgets.QDialog):
+    def __init__(self):
+        super(AuthDialog, self).__init__()
+        self.lbl = QtWidgets.QLabel(self)
+        self.lbl.setText("Hatalı E-mail veya Şifre!")
+        self.btn = QtWidgets.QPushButton('Cancel')
+        self.btn.setEnabled(True)
+        self.btn.clicked.connect(self.close)
+        self.setWindowTitle("Hata!")
+        self.resize(250,50)

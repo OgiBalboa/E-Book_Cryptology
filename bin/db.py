@@ -14,7 +14,6 @@ from config import config
 
 class db:
 	def __init__(self):
-
 		cred = credentials.Certificate('.env/marun-bks.json')
 		self.firebase = firebase.Firebase(config)
 		#self.storage = self.firebase.storage()
@@ -22,7 +21,7 @@ class db:
 		self.user = None
 		self.app = firebase_admin.initialize_app(cred,config)
 		self.books = db_.reference("books")
-		self.st_books = db_.reference("books/st_books")
+		self.db = db_
 		self.students = db_.reference("students")
 		self.codes = db_.reference("codes")
 		self.storage = storage.bucket()
@@ -35,7 +34,10 @@ class db:
 		with open("admin_key.txt","r") as admin_key:
 			output = admin_key.read().split("\n")
 		os.system("rm admin_key.txt")
-		return output            
+		return output
+	def upload_book(self,name,path):
+		self.storage.blob("books/"+name).upload_from_filename(path)
+		return True
 #db().register("dede@gmail.com","123456")
 def permission(db):
 	key = b'pRmgMa8T0INjEAfksaq2aafzoZXEuwKI7wDe4c1F8AY='

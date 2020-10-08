@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from pylocker import ServerLocker
 from cryptography.fernet import Fernet
 import logos_rc
+import os
 from book import Book,code
 global library_
 import random
@@ -25,8 +26,9 @@ class BookSettings(QtWidgets.QMainWindow):
 
         info = {new_code():{
             "c_book":self.book_name.text(),
-            "code":new_code.book_date,
-            "code_date": new_code.date,
+            "code":new_code.text,
+            "date": new_code.date,
+            "book_date":new_code.book_date,
             "user": new_code.user,
         }
         }
@@ -76,6 +78,7 @@ class AdminPanel(QtWidgets.QMainWindow):
     def new_book(self):
         self.new_book_gui.show()
     def open_library(self):
+        self.library_gui.add_book()
         self.library_gui.show()
 class AddBook(QtWidgets.QMainWindow):
     def __init__(self,main):
@@ -88,22 +91,24 @@ class AddBook(QtWidgets.QMainWindow):
     def submit(self):
         if self.check_inputs() != True:
             return
-        print("oldu")
-        self.main.db.books.update(self.retrieve_info())
+        self.retrieve_info()
+        self.main.db.books.update(self.info)
+        self.main.setWaiting(True,"Kitap yükleniyor lütfen bekleyin..")
+        self.main.db.upload_book(self.file_path_lbl.text().split("/")[-1],self.file_path_lbl.text())
+        self.main.setWaiting(False,"")
     def check_inputs(self):
         if self.book_name_input.text() != "" and self.supervisor_input.text() != "" and self.lecture_input.text() != "" \
             and self.file_path_lbl.text() != "": return True
         else: return False
 
     def retrieve_info(self):
-        info = {self.book_name_input.text():{
+        self.info = {self.book_name_input.text():{
             "name":self.book_name_input.text(),
             "lecture":self.lecture_input.text(),
             "code": self.book_name_input.text().lower().lower().replace(" ","_"),
             "supervisor": self.supervisor_input.text(),
         }
         }
-        return info
     def add_file(self):
         self.file_path = QtWidgets.QFileDialog.getOpenFileName(self, 'Kitap Dosyasını Seçiniz','', "Kitap(*.epub *.pdf *docx);;Tümünü Göster(*)")
         self.file_path_lbl.setText(self.file_path[0])
