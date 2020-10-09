@@ -31,12 +31,22 @@ class AuthMenu(QtWidgets.QMainWindow):
         self.auth_frame.setHidden(True)
 
     def check_inputs(self, hint=None):
-        if self.password_input.text() == "":
+        if hint == "signin" and self.password_input.text() == "":
+            print("viyy")
             return True
         if hint == "signin" and len(self.password_input.text()) > 5:
             return True
-        elif hint == "register" and len(self.reg_password_input.text()) > 5:
-            self.admin_key = db.download_key()[0]
+
+        elif hint == "register" and len(self.reg_password_input.text()) > 5 and "@" in list(self.reg_username_input.text()) \
+            and len(self.reg_name_input.text()) > 4 and len(self.reg_no_input.text()) == 9 :
+
+            try:
+                if ".com" != self.reg_username_input.text()[-4:]: return False
+            except Exception as e:
+                print(e)
+                return False
+
+            self.admin_key = self.main.db.download_key()[0]
             if self.register_key.text() == self.admin_key:
                 return True
             else:
@@ -65,11 +75,28 @@ class AuthMenu(QtWidgets.QMainWindow):
 
     def register(self):
         if self.check_inputs(hint="register") == False:
-            print("olmadi")
+            self.dialog.show()
             return False
-        email = self.reg_username_input.text() + "@gmail.com"
-        print(db.register(email=email, password=self.reg_password_input.text()))
-
+        email = self.reg_username_input.text()
+        try:
+            self.main.db.register(email=email, password=self.reg_password_input.text())
+            self.dialog.show_("Kayıt Başarılı","BAŞARILI")
+            self.retrieve_register_info()
+            self.main.db.students.update(self.info)
+            self.back()
+        except:
+            self.dialog.show_("Bilgileri doğru girdiğinizden emin olun veya uygulamayı yeniden başlatın.")
+            return False
+    def retrieve_register_info(self):
+        self.main.no = self.reg_no_input.text()
+        self.main.email = self.reg_username_input.text()
+        self.main.user_info = "student"
+        self.info = { self.main.no : {
+            "email": self.main.email,
+            "name": self.reg_name_input.text(),
+            "info": self.main.user_info,
+            "secret": "student",
+                   }}
 class AuthDialog(QtWidgets.QDialog):
     def __init__(self):
         super(AuthDialog, self).__init__()
@@ -80,3 +107,11 @@ class AuthDialog(QtWidgets.QDialog):
         self.btn.clicked.connect(self.close)
         self.setWindowTitle("Hata!")
         self.resize(250,50)
+    def show_(self,text,title = None):
+        self.lbl.setText(text)
+        if title != None: self.setWindowTitle(title)
+        else : self.setWindowTitle("Hata!")
+        self.show()
+
+if __name__ == "__main__":
+    pass

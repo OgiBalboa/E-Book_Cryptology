@@ -72,7 +72,7 @@
         <x>20</x>
         <y>20</y>
         <width>271</width>
-        <height>232</height>
+        <height>290</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -110,7 +110,21 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="password_input"/>
+        <widget class="QLineEdit" name="password_input">
+         <property name="echoMode">
+          <enum>QLineEdit::Password</enum>
+         </property>
+         <property name="placeholderText">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox">
+         <property name="text">
+          <string>Giriş Bilgilerimi Hatırla</string>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
@@ -250,7 +264,7 @@ color: rgb(0, 0, 127);</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="reg_username_input_2"/>
+       <widget class="QLineEdit" name="reg_no_input"/>
       </item>
       <item>
        <widget class="QLabel" name="label_13">
@@ -263,7 +277,7 @@ color: rgb(0, 0, 127);</string>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="reg_username_input_3"/>
+       <widget class="QLineEdit" name="reg_name_input"/>
       </item>
       <item alignment="Qt::AlignHCenter">
        <widget class="QLabel" name="label_5">
@@ -380,6 +394,12 @@ color: rgb(0, 0, 127);</string>
         </property>
         <property name="text">
          <string>Kayıt Ol</string>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+        <property name="default">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
