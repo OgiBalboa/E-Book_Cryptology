@@ -64,7 +64,7 @@ class AuthMenu(QtWidgets.QMainWindow):
                 self.main.no = items
         else:
             self.main.no = self.username_input.text()
-            self.main.email = self.username_input.text() + "@gmail.com"
+            self.main.email = self.username_input.text()
             self.main.password = self.password_input.text()
         self.close()
         if self.main.db.sign(email=self.main.email, password=self.main.password) == None:
