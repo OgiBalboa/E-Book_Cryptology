@@ -32,7 +32,6 @@ class AuthMenu(QtWidgets.QMainWindow):
 
     def check_inputs(self, hint=None):
         if hint == "signin" and self.password_input.text() == "":
-            print("viyy")
             return True
         if hint == "signin" and len(self.password_input.text()) > 5:
             return True
@@ -96,6 +95,9 @@ class AuthMenu(QtWidgets.QMainWindow):
             "name": self.reg_name_input.text(),
             "info": self.main.user_info,
             "secret": "student",
+            "st_books": {
+                "None": "None"
+            }
                    }}
 class AuthDialog(QtWidgets.QDialog):
     def __init__(self):

@@ -56,14 +56,16 @@ class MainMenu(QtWidgets.QMainWindow):
         path = os.path.join(cpath,"res","lib",name)
         os.system('sumatra -restrict -view "single page" "' + path +'"')
     def update_library(self):
-        for book in db.students.child(self.no).child("st_books").get().items():
+        try:
+            for book in db.students.child(self.no).child("st_books").get().items():
 
-            info = db.books.child(book[0]).get()
-            if info == None:
-                continue
-            date = book[1]
-            library.update({book: Book(info["name"], info["supervisor"], info["lecture"],
-                                       date)})
+                info = db.books.child(book[0]).get()
+                if info == None:
+                    continue
+                date = book[1]
+                library.update({book: Book(info["name"], info["supervisor"], info["lecture"],
+                                           date)})
+        except : pass
         self.check_library()
     def add_book(self,code):
         name = None
