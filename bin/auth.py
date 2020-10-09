@@ -60,18 +60,20 @@ class AuthMenu(QtWidgets.QMainWindow):
             self.main.email = "170216009@gmail.com"
             self.main.password = "gfb.1907"
             #self.main.no = "170216009"
-            for items in self.main.db.students.order_by_child('email').equal_to(self.main.email).get().keys():
-                self.main.no = items
+
         else:
-            self.main.no = self.username_input.text()
             self.main.email = self.username_input.text()
             self.main.password = self.password_input.text()
+        for items in self.main.db.students.order_by_child('email').equal_to(self.main.email).get().keys():
+            self.main.no = items
         self.close()
-        if self.main.db.sign(email=self.main.email, password=self.main.password) == None:
-            self.main.submit()
-            self.main.show()
-        else: self.dialog.show()
-
+        try:
+            if self.main.db.sign(email=self.main.email, password=self.main.password) == None:
+                self.main.submit()
+                self.main.show()
+            else: self.dialog.show()
+        except:
+            self.dialog.show_("Bilgileriniz hatalı veya internetiniz yok. Sorun varsa lütfen yöneticiye bildiriniz.","HATA")
     def register(self):
         if self.check_inputs(hint="register") == False:
             self.dialog.show()

@@ -43,7 +43,6 @@ class MainMenu(QtWidgets.QMainWindow):
         self.dlg = WaitDialog()
         self.dlg.close()
     def submit(self):
-
         user_info = db.students.child(self.no).get()
         if user_info["secret"] == "admin":
             self.admin = True
