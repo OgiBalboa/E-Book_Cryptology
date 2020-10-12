@@ -93,9 +93,7 @@ class AddBook(QtWidgets.QMainWindow):
             return
         self.retrieve_info()
         self.main.db.books.update(self.info)
-        self.main.setWaiting(True,"Kitap yükleniyor lütfen bekleyin..")
-        self.main.db.upload_book(self.file_path_lbl.text().split("/")[-1],self.file_path_lbl.text())
-        self.main.setWaiting(False,"")
+        self.main.thread_work(lambda: self.main.db.upload_book(self.file_path_lbl.text().split("/")[-1],self.file_path_lbl.text()),True)
     def check_inputs(self):
         if self.book_name_input.text() != "" and self.supervisor_input.text() != "" and self.lecture_input.text() != "" \
             and self.file_path_lbl.text() != "": return True

@@ -9,7 +9,6 @@ from pylocker import ServerLocker
 from cryptography.fernet import Fernet
 import logos_rc
 import datetime
-import zipfile
 import pyminizip
 import tempfile
 import os
@@ -129,11 +128,12 @@ if __name__ == "__main__":
         #zf.extractall(pwd=b"abc123")
     """
     with tempfile.TemporaryDirectory() as tdir:
-        sourceFile = "ogibook.epub"
+        sourceFile = "/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/ogibook.epub"
         destinationFile = "ogibook.zip"
         password = "nonshallpass"
-        compression_level = 9  # 1-9
-        pyminizip.compress(sourceFile, None, os.path.join(tdir,destinationFile), password, compression_level)
+        compression_level = 9
+        pyminizip.compress(sourceFile, None, "/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/ogibook.zip", password, compression_level)
 
-    #pyminizip.uncompress("ogibook.zip","nonshallpass",None,)
+    pyminizip.uncompress("/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/ogibook.zip","nonshallpass",os.getcwd()+"/",0)
     pass
+

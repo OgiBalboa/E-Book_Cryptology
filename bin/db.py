@@ -39,7 +39,7 @@ class db:
 		self.storage.blob("books/"+name).upload_from_filename(path)
 		return True
 
-def permission(db):
+def permission(db,temp):
 	key = db.db.reference("App").get()["key"]
 	cipher_suite = Fernet(key)
 	with open('.env/permission.bin', 'rb') as file_object:

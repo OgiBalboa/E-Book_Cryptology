@@ -17,8 +17,11 @@ import logos_rc
 from auth import AuthMenu
 from admin_panel import AdminPanel
 from book import Book
+import pyminizip
+import tempfile
+from functools import partial
 db = db()
-if permission(db) == False:
+if permission(db,"temp") == False:
     exit()
 #lock = ServerLocker(password = 
 global library
@@ -28,27 +31,37 @@ class MainMenu(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainMenu,self).__init__()
         uic.loadUi('ui/mainmenu.ui',self)
+
+        self.threadpool = QtCore.QThreadPool()
+
+        #self.threadpool.start(self.worker)
+        #self.worker.signals.user_video.connect(self.upd_user)
+
         self.admin_panel = None
         self.email = ""
         self.no = 0
         self.password = ""
+        self.dlg = WaitDialog()
+
         self.add_book_btn.clicked.connect(lambda: self.add_book(self.code_input.text()))
         self.openbook_btn.clicked.connect(self.open_book)
-        self.open_admin_panel_btn.clicked.connect(self.open_admin_panel)
-        self.refresh_btn.clicked.connect(self.update_library)
+        self.open_admin_panel_btn.clicked.connect(lambda: self.threadpool.start(self.worker))
 
+        self.refresh_btn.clicked.connect(self.update_library)
         self.open_admin_panel_btn.hide()
         self.admin = False
         self.db = db
-        self.dlg = WaitDialog()
+
         self.dlg.close()
+        self.temp = tempfile.TemporaryDirectory()
+
     def submit(self):
         user_info = db.students.child(self.no).get()
         if user_info["secret"] == "admin":
             self.admin = True
             self.open_admin_panel_btn.show()
             self.update_library()
-        self.db.st_books = self.db.db.reference("books/" + self.no + "/st_books")
+        self.db.st_books = self.db.db.reference("students/" + self.no + "/st_books")
     def open_book(self):
         name = self.tableWidget.selectedItems()[0].data(0)+".epub"
         cpath = os.getcwd()
@@ -64,7 +77,7 @@ class MainMenu(QtWidgets.QMainWindow):
                 date = book[1]
                 library.update({book: Book(info["name"], info["supervisor"], info["lecture"],
                                            date)})
-        except : pass
+        except Exception as e: print(e)
         self.check_library()
     def add_book(self,code):
         name = None
@@ -75,8 +88,9 @@ class MainMenu(QtWidgets.QMainWindow):
             book = book[1]
             library.update({name:Book(book["name"],book["supervisor"],book["lecture"],date)})
         if not name == None:
-            db.storage.blob("books/"+name+".epub").download_to_filename(os.path.join(os.getcwd(),"res","lib",name+".epub"))
-        self.db.st_books()
+            self.thread_work(lambda : db.storage.blob("books/"+name+".epub").download_to_filename(os.path.join(os.getcwd(),"res","lib",name+".epub")),True)
+
+        self.db.st_books.update({name:date})
         self.check_library()
     def check_library(self,):
         global library
@@ -90,22 +104,66 @@ class MainMenu(QtWidgets.QMainWindow):
             self.tableWidget.setItem(row,3,QtWidgets.QTableWidgetItem(book.date))
     def open_admin_panel(self):
         self.admin_panel.show()
-    def setWaiting(self,status: bool,text):
+    def setWaiting(self,status: bool,text = "İşlem Sürüyor Lütfen Bekleyiniz..."):
         if status == True:
-            self.dlg.setTitle(text)
-            self.dlg.show()
+            self.dlg.show_(text,"Lütfen Bekleyin")
         else:
             self.dlg.close()
+    def thread_work (self,func,dlg = None):
+        worker = server_worker(self)
+        if dlg: worker.signals.finished.connect(self.setWaiting)
+        worker.func = func
+        self.threadpool.start(worker)
 
-class WaitDialog(QtWidgets.QProgressDialog):
+class WaitDialog(QtWidgets.QDialog):
     def __init__(self):
         super(WaitDialog, self).__init__()
-        self.setAutoClose(True)
+        self.lbl = QtWidgets.QLabel(self)
+        self.lbl.setText("Hatalı E-mail veya Şifre!")
         self.btn = QtWidgets.QPushButton('Cancel')
-        self.btn.setEnabled(False)
-        self.setCancelButton(self.btn)
-    def setTitle(self,text):
-        self.setWindowTitle(text)
+        self.btn.setEnabled(True)
+        self.btn.clicked.connect(self.close)
+        self.setWindowTitle("Hata!")
+        self.resize(250, 50)
+
+    def show_(self, text, title=None):
+        self.lbl.setText(text)
+        if title != None:
+            self.setWindowTitle(title)
+        else:
+            self.setWindowTitle("Hata!")
+        self.show()
+
+class server_signals(QtCore.QObject):
+
+
+    finished = QtCore.pyqtSignal(object)
+    """
+    error = pyqtSignal(tuple)
+    user_video = pyqtSignal(object)
+    guest_video = pyqtSignal(object)
+    """
+    pass
+class server_worker(QtCore.QRunnable):
+
+    #@pyqtSlot()
+    def __init__(self,main):
+        super(server_worker, self).__init__()
+        self.signals = server_signals()
+        self.flag = False
+        self.main = main
+        self.func = None
+    def run(self,):
+        if self.flag == True:
+            return
+        else:
+            self.flag = True
+            self.signals.finished.emit(True)
+            if not self.func == None: self.func()
+            self.signals.finished.emit(False)
+            self.flag = False
+
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
