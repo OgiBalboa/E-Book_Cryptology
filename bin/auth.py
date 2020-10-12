@@ -8,8 +8,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from pylocker import ServerLocker
 from cryptography.fernet import Fernet
 import logos_rc
-
-
+import datetime
+import zipfile
+import pyminizip
+import tempfile
+import os
 class AuthMenu(QtWidgets.QMainWindow):
     def __init__(self,main):
         super(AuthMenu, self).__init__()
@@ -91,7 +94,7 @@ class AuthMenu(QtWidgets.QMainWindow):
     def retrieve_register_info(self):
         self.main.no = self.reg_no_input.text()
         self.main.email = self.reg_username_input.text()
-        self.main.user_info = "student"
+        self.main.user_info = "/".join(["Teknoloji",self.comboBox.currentText() ,self.comboBox_2.currentText()])
         self.info = { self.main.no : {
             "email": self.main.email,
             "name": self.reg_name_input.text(),
@@ -118,4 +121,19 @@ class AuthDialog(QtWidgets.QDialog):
         self.show()
 
 if __name__ == "__main__":
+    """
+    zip_file = 'ogibook.zip'
+    password = 'abc123'
+    with zipfile.ZipFile(zip_file) as zf:
+        zf.setpassword(password)
+        #zf.extractall(pwd=b"abc123")
+    """
+    with tempfile.TemporaryDirectory() as tdir:
+        sourceFile = "ogibook.epub"
+        destinationFile = "ogibook.zip"
+        password = "nonshallpass"
+        compression_level = 9  # 1-9
+        pyminizip.compress(sourceFile, None, os.path.join(tdir,destinationFile), password, compression_level)
+
+    #pyminizip.uncompress("ogibook.zip","nonshallpass",None,)
     pass

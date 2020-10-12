@@ -6,7 +6,7 @@ from firebase_admin import credentials,storage,auth
 from firebase_admin import db as db_
 import sys
 # Fetch the service account key JSON file contents
-
+import base64
 # Initialize the app with a service account, granting admin privileges
 import time
 sys.path.append(".env")
@@ -38,9 +38,9 @@ class db:
 	def upload_book(self,name,path):
 		self.storage.blob("books/"+name).upload_from_filename(path)
 		return True
-#db().register("dede@gmail.com","123456")
+
 def permission(db):
-	key = b'pRmgMa8T0INjEAfksaq2aafzoZXEuwKI7wDe4c1F8AY='
+	key = db.db.reference("App").get()["key"]
 	cipher_suite = Fernet(key)
 	with open('.env/permission.bin', 'rb') as file_object:
 		for line in file_object:
@@ -51,3 +51,5 @@ def permission(db):
 		return True
 	else:
 		return False
+if __name__ == "__main__":
+	pass
