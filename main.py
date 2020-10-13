@@ -41,20 +41,21 @@ class MainMenu(QtWidgets.QMainWindow):
         self.email = ""
         self.no = 0
         self.password = ""
+        self.library_path = os.path.join(os.getcwd(), "res", "lib")
         self.dlg = WaitDialog()
 
         self.add_book_btn.clicked.connect(lambda: self.add_book(self.code_input.text()))
         self.openbook_btn.clicked.connect(self.open_book)
-        self.open_admin_panel_btn.clicked.connect(lambda: self.threadpool.start(self.worker))
+        self.open_admin_panel_btn.clicked.connect(self.open_admin_panel)
 
         self.refresh_btn.clicked.connect(self.update_library)
         self.open_admin_panel_btn.hide()
         self.admin = False
         self.db = db
-
+        self.flag = False
         self.dlg.close()
         self.temp = tempfile.TemporaryDirectory()
-
+        self.thread_work(lambda: self.unzip_books())
     def submit(self):
         user_info = db.students.child(self.no).get()
         if user_info["secret"] == "admin":
@@ -62,10 +63,11 @@ class MainMenu(QtWidgets.QMainWindow):
             self.open_admin_panel_btn.show()
             self.update_library()
         self.db.st_books = self.db.db.reference("students/" + self.no + "/st_books")
+
     def open_book(self):
         name = self.tableWidget.selectedItems()[0].data(0)+".epub"
         cpath = os.getcwd()
-        path = os.path.join(cpath,"res","lib",name)
+        path = os.path.join(self.temp,name)
         os.system('sumatra -restrict -view "single page" "' + path +'"')
     def update_library(self):
         try:
@@ -88,8 +90,9 @@ class MainMenu(QtWidgets.QMainWindow):
             book = book[1]
             library.update({name:Book(book["name"],book["supervisor"],book["lecture"],date)})
         if not name == None:
-            self.thread_work(lambda : db.storage.blob("books/"+name+".epub").download_to_filename(os.path.join(os.getcwd(),"res","lib",name+".epub")),True)
 
+            self.thread_work(lambda : db.storage.blob("books/"+name+".zip").download_to_filename(os.path.join(self.library_path,name+".zip")),True)
+        self.unzip(book["name"]+".zip")
         self.db.st_books.update({name:date})
         self.check_library()
     def check_library(self,):
@@ -109,11 +112,26 @@ class MainMenu(QtWidgets.QMainWindow):
             self.dlg.show_(text,"Lütfen Bekleyin")
         else:
             self.dlg.close()
-    def thread_work (self,func,dlg = None):
+    def thread_work (self,func,dlg = None,hint = None):
         worker = server_worker(self)
         if dlg: worker.signals.finished.connect(self.setWaiting)
+        if hint == "unzip": worker.signals.finished.connect(self.flag_)
         worker.func = func
         self.threadpool.start(worker)
+    def flag_(self,status):
+        self.flag = status
+
+    def unzip(self, book):
+        password = self.db.db.reference("App").get()["unzip_key"]
+        name = os.path.splitext(book)[0]
+        source_file = os.path.join(self.library_path, book)
+        dest_file = os.path.join(self.temp.name, name + ".epub")
+        try: pyminizip.uncompress(source_file, password, dest_file, 0)
+        except: pass
+        os.rename(os.path.join(os.getcwd(), name + ".epub"), dest_file)
+    def unzip_books(self,hint =  None):
+        for book in os.listdir(self.library_path):
+            if book.endswith(".zip"): self.unzip(book)
 
 class WaitDialog(QtWidgets.QDialog):
     def __init__(self):
@@ -135,8 +153,6 @@ class WaitDialog(QtWidgets.QDialog):
         self.show()
 
 class server_signals(QtCore.QObject):
-
-
     finished = QtCore.pyqtSignal(object)
     """
     error = pyqtSignal(tuple)

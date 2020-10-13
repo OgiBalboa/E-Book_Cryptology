@@ -69,7 +69,7 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -109,6 +109,9 @@
         </property>
         <property name="scaledContents">
          <bool>true</bool>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
         </property>
        </widget>
       </item>
@@ -188,7 +191,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -249,17 +252,9 @@
      </item>
     </layout>
    </widget>
+   <zorder>layoutWidget</zorder>
    <zorder>frame</zorder>
    <zorder>book_name</zorder>
-   <zorder>label_3</zorder>
-   <zorder>code_date_edit</zorder>
-   <zorder>label_4</zorder>
-   <zorder>book_date_edit</zorder>
-   <zorder>code_output</zorder>
-   <zorder>label_5</zorder>
-   <zorder>userBox</zorder>
-   <zorder>label_2</zorder>
-   <zorder>set_user_btn</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

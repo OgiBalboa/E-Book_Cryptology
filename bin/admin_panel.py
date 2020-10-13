@@ -93,7 +93,9 @@ class AddBook(QtWidgets.QMainWindow):
             return
         self.retrieve_info()
         self.main.db.books.update(self.info)
-        self.main.thread_work(lambda: self.main.db.upload_book(self.file_path_lbl.text().split("/")[-1],self.file_path_lbl.text()),True)
+        path = os.path.split(self.file_path_lbl.text())
+        self.main.thread_work(lambda: self.main.db.upload_book(path[1],path[0]),True)
+        self.reset_inputs()
     def check_inputs(self):
         if self.book_name_input.text() != "" and self.supervisor_input.text() != "" and self.lecture_input.text() != "" \
             and self.file_path_lbl.text() != "": return True
@@ -107,6 +109,11 @@ class AddBook(QtWidgets.QMainWindow):
             "supervisor": self.supervisor_input.text(),
         }
         }
+    def reset_inputs(self):
+        self.book_name_input.setText("")
+        self.supervisor_input.setText("")
+        self.lecture_input.setText("")
+        self.file_path_lbl.setText("")
     def add_file(self):
         self.file_path = QtWidgets.QFileDialog.getOpenFileName(self, 'Kitap Dosyasını Seçiniz','', "Kitap(*.epub *.pdf *docx);;Tümünü Göster(*)")
         self.file_path_lbl.setText(self.file_path[0])

@@ -9,6 +9,7 @@ import sys
 import base64
 # Initialize the app with a service account, granting admin privileges
 import time
+import pyminizip
 sys.path.append(".env")
 from config import config
 
@@ -36,7 +37,13 @@ class db:
 		os.system("rm admin_key.txt")
 		return output
 	def upload_book(self,name,path):
-		self.storage.blob("books/"+name).upload_from_filename(path)
+		password = self.db.reference("App").get()["unzip_key"]
+		book_path = os.path.join(path,name)
+		zip_name = os.path.splitext(name)[0]+".zip"
+		zip_path = os.path.join(path,zip_name)
+		#print(name,"\n",zip_name,"\n",path,"\n",zip_path)
+		pyminizip.compress(book_path, None, zip_path ,password, 1)
+		self.storage.blob("books/"+zip_name).upload_from_filename(zip_path)
 		return True
 
 def permission(db,temp):

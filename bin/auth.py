@@ -74,8 +74,8 @@ class AuthMenu(QtWidgets.QMainWindow):
                 self.main.submit()
                 self.main.show()
             else: self.dialog.show()
-        except:
-            self.dialog.show_("Bilgileriniz hatalı veya internetiniz yok. Sorun varsa lütfen yöneticiye bildiriniz.","HATA")
+        except Exception as e:
+            self.dialog.show_("Bilgileriniz hatalı veya internetiniz yok. Sorun varsa lütfen yöneticiye bildiriniz.\n HATA MESAJI \n" + str(e),"HATA")
     def register(self):
         if self.check_inputs(hint="register") == False:
             self.dialog.show()
@@ -87,8 +87,9 @@ class AuthMenu(QtWidgets.QMainWindow):
             self.retrieve_register_info()
             self.main.db.students.update(self.info)
             self.back()
-        except:
-            self.dialog.show_("Bilgileri doğru girdiğinizden emin olun veya uygulamayı yeniden başlatın.")
+        except Exception as e:
+            print(e)
+            self.dialog.show_("Bilgileri doğru girdiğinizden emin olun veya uygulamayı yeniden başlatın.\n HATA MESAJI \n" + str(e))
             return False
     def retrieve_register_info(self):
         self.main.no = self.reg_no_input.text()
@@ -134,6 +135,6 @@ if __name__ == "__main__":
         compression_level = 9
         pyminizip.compress(sourceFile, None, "/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/ogibook.zip", password, compression_level)
 
-    pyminizip.uncompress("/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/ogibook.zip","nonshallpass",os.getcwd()+"/",0)
+
     pass
 
