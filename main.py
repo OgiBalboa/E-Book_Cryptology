@@ -9,7 +9,7 @@ sys.path.append("bin")
 from PyQt5 import QtCore, QtGui, QtWidgets,uic
 from subprocess import call
 import datetime
-from db import db,permission
+from db import db,permission, db_offline, permission_offline
 import os
 from pylocker import ServerLocker
 from cryptography.fernet import Fernet
@@ -69,6 +69,7 @@ class MainMenu(QtWidgets.QMainWindow):
         cpath = os.getcwd()
         path = os.path.join(self.temp,name)
         os.system('sumatra -restrict -view "single page" "' + path +'"')
+        os.remove(path)
     def update_library(self):
         try:
             for book in db.students.child(self.no).child("st_books").get().items():

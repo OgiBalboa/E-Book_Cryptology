@@ -11,6 +11,7 @@ import logos_rc
 import datetime
 import pyminizip
 import tempfile
+import zipfile
 import os
 class AuthMenu(QtWidgets.QMainWindow):
     def __init__(self,main):
@@ -127,14 +128,17 @@ if __name__ == "__main__":
     with zipfile.ZipFile(zip_file) as zf:
         zf.setpassword(password)
         #zf.extractall(pwd=b"abc123")
-    """
+    
     with tempfile.TemporaryDirectory() as tdir:
         sourceFile = "/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/ogibook.epub"
         destinationFile = "ogibook.zip"
         password = "nonshallpass"
         compression_level = 9
         pyminizip.compress(sourceFile, None, "/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/ogibook.zip", password, compression_level)
-
+    """
+    pw = "pRmgMa8T0INjEAfksaq2aafzoZXEuwKI7wDe4c1F8AY="
+    book = zipfile.ZipFile("ogibook.zip").read("ogibook.epub",bytes(pw,"ascii"))
+    print(type(book))
 
     pass
 
