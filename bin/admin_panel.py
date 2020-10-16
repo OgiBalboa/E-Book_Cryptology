@@ -46,6 +46,7 @@ class AdminLibrary(QtWidgets.QMainWindow):
         self.book_settings.set_book(self.tableWidget.selectedItems()[0].data(0))
         self.book_settings.show()
     def add_book(self,):
+        if not self.main.online: return
         for book in self.main.db.books.get().items():
             date = "None"
             book = book[1]

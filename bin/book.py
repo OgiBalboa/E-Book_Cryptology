@@ -1,11 +1,13 @@
 import random
 class Book:
-    def __init__(self,name,supervisor,lecture,date,users = None):
+    def __init__(self,name,supervisor,lecture,date,users = "None"):
         self.name = name
         self.supervisor = supervisor
         self.lecture = lecture
         self.date = date
         self.users = users
+    def get_vals(self):
+        return ",".join([str(self.name),str(self.supervisor),str(self.lecture),str(self.date),str(self.users)])
 
 class code:
     def __init__(self,date,book_date,user = ""):

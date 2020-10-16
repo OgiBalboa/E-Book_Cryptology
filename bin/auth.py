@@ -24,7 +24,13 @@ class AuthMenu(QtWidgets.QMainWindow):
         self.register_frame.setHidden(True)
         self.reg_submit_button.clicked.connect(self.register)
         self.reg_cancel_button.clicked.connect(self.back)
+        self.checkBox.stateChanged.connect(self.rememberme)
         self.dialog = AuthDialog()
+        if self.main.ofdb.rememberme:
+            self.checkBox.setCheckState(True)
+            self.username_input.setText(self.main.ofdb.user_info[0])
+    def rememberme(self,val):
+        self.main.ofdb.setRememberme(bool(val))
     def back(self):
         self.register_frame.setHidden(True)
         self.auth_frame.setHidden(False)
@@ -67,11 +73,26 @@ class AuthMenu(QtWidgets.QMainWindow):
         else:
             self.main.email = self.username_input.text()
             self.main.password = self.password_input.text()
-        for items in self.main.db.students.order_by_child('email').equal_to(self.main.email).get().keys():
-            self.main.no = items
+        try:
+            for items in self.main.db.students.order_by_child('email').equal_to(self.main.email).get().keys():
+                self.main.no = items
+                if len(self.main.no) < 9:
+                    self.main.setWaiting(True,"Sisteme Kaydınız Bulunamadı ")
+                    return
+        except:
+            if self.main.ofdb.login(self.main.email,self.main.password):
+                self.close()
+                self.main.login_time = datetime.datetime.now()
+                self.main.submit()
+                self.main.show()
+                return
+            else:
+                self.main.setWaiting(True,"Kullanıcı adı veya şifre hatalı (lütfen son giriş yaptığınız bilgiler ile giriniz veya internet bağlantısını kontrol edin.")
+                return
         self.close()
         try:
             if self.main.db.sign(email=self.main.email, password=self.main.password) == None:
+                self.main.login_time = datetime.datetime.now()
                 self.main.submit()
                 self.main.show()
             else: self.dialog.show()
@@ -135,10 +156,11 @@ if __name__ == "__main__":
         password = "nonshallpass"
         compression_level = 9
         pyminizip.compress(sourceFile, None, "/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/ogibook.zip", password, compression_level)
-    """
+    
     pw = "pRmgMa8T0INjEAfksaq2aafzoZXEuwKI7wDe4c1F8AY="
     book = zipfile.ZipFile("ogibook.zip").read("ogibook.epub",bytes(pw,"ascii"))
     print(type(book))
+    """
 
     pass
 

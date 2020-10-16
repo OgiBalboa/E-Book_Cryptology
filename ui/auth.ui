@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>541</width>
-    <height>575</height>
+    <width>544</width>
+    <height>564</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <normaloff>:/marun_logo/img/marun.png</normaloff>:/marun_logo/img/marun.png</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(215, 220, 232);</string>
+   <string notr="true">background-color: rgb(211, 215, 207);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QFrame" name="auth_frame">
@@ -27,9 +27,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>0</x>
       <y>0</y>
-      <width>531</width>
+      <width>561</width>
       <height>561</height>
      </rect>
     </property>
@@ -48,8 +48,8 @@
     <widget class="QFrame" name="frame">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>120</y>
+       <x>110</x>
+       <y>130</y>
        <width>331</width>
        <height>351</height>
       </rect>
@@ -192,6 +192,53 @@ color: rgb(0, 0, 127);</string>
       </layout>
      </widget>
     </widget>
+    <widget class="QLabel" name="label_14">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>20</y>
+       <width>251</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(211, 215, 207);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../res/logos.qrc">:/tf_logo/img/tf.png</pixmap>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>231</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>URW Gothic</family>
+       <pointsize>14</pointsize>
+       <weight>7</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 63 14pt &quot;URW Gothic&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Belge Kriptolama Sistemi</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QFrame" name="register_frame">
     <property name="enabled">
@@ -226,7 +273,7 @@ color: rgb(0, 0, 127);</string>
        <x>60</x>
        <y>20</y>
        <width>271</width>
-       <height>384</height>
+       <height>400</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
