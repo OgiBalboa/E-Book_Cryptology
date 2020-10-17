@@ -27,6 +27,7 @@ class MainMenu(QtWidgets.QMainWindow):
     def __init__(self,connection):
         super(MainMenu,self).__init__()
         uic.loadUi('ui/mainmenu.ui',self)
+        self.offline_key ="5Mm13Gc1iRLy5ukPYRXrwVXYgKLmBFbjPjyVF8ntdCo="
         self.threadpool = QtCore.QThreadPool()
         self.admin_panel = None
         self.email = ""
@@ -37,7 +38,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self.library_path = os.path.join(self.documents_path,"library")
         if not os.path.isdir(self.documents_path): os.mkdir(self.documents_path)
         if not os.path.isdir(self.library_path): os.mkdir(self.library_path)
-        self.dlg = WaitDialog()
+        self.dlg = WaitDialog(self)
         self.add_book_btn.clicked.connect(lambda: self.add_book(self.code_input.text()))
         self.openbook_btn.clicked.connect(self.open_book)
         self.open_admin_panel_btn.clicked.connect(self.open_admin_panel)
@@ -46,21 +47,27 @@ class MainMenu(QtWidgets.QMainWindow):
         self.open_admin_panel_btn.hide()
         self.admin = False
         self.db = db
+        self.offline_pw = self.db.offline_pw
         self.ofdb = db_offline()
         self.flag = False
         self.dlg.close()
         self.temp = tempfile.TemporaryDirectory()
         self.online = connection
         self.ofdb.main = self
-        self.ofdb.retrieve_info()
+        self.ofdb.offline_pw = self.offline_pw
+        if os.path.exists(os.path.join(self.documents_path,"user.zip")): self.ofdb.retrieve_info()
         #self.thread_work(lambda: self.unzip_books())
     def submit(self):
         if self.online:
+            self.save_infos()
             user_info = db.students.child(self.no).get()
             if user_info["secret"] == "admin":
                 self.admin = True
                 self.open_admin_panel_btn.show()
-
+            elif user_info["secret"] == "blocked":
+                self.close()
+                SystemExit("HATA")
+                #sys.exit("HATA SİSTEMDEN ENGELLENDİNİZ")
             self.db.st_books = self.db.db.reference("students/" + self.no + "/st_books")
         self.update_library()
     def open_book(self):
@@ -81,10 +88,7 @@ class MainMenu(QtWidgets.QMainWindow):
                         continue
                     date = book[1]
                     library.update({book: Book(info["name"], info["supervisor"], info["lecture"], date)})
-                self.ofdb.save_user_info([self.email,self.password,".".join([str(self.login_time.day),str(self.login_time.month),
-                                          str(self.login_time.year)]),self.db.db.reference("App").get()["unzip_key"],
-                                          str(self.ofdb.rememberme)])
-                self.ofdb.save_book_info(library.values())
+                    self.save_infos()
             except Exception as e: print(e)
             ###***************************** OFFLINE İKEN YAPILACAK İŞLEMLER********************************************************
         else:
@@ -102,21 +106,32 @@ class MainMenu(QtWidgets.QMainWindow):
                      str(self.ofdb.rememberme)])
                 self.ofdb.save_book_info(library.values())
         self.check_library()
+    def save_infos(self):
+        self.ofdb.save_user_info(
+            [self.email, self.password, ".".join([str(self.login_time.day), str(self.login_time.month),
+                                                  str(self.login_time.year)]),
+             self.db.db.reference("App").get()["unzip_key"],
+             str(self.ofdb.rememberme)])
+        self.ofdb.save_book_info(library.values())
     def add_book(self,code):
-        name = None
-        for item in db.codes.order_by_child('code').equal_to(code).get().items():
-            name = item[1]["c_book"]
-            date = item[1]["date"]
-        for book in db.books.order_by_child('name').equal_to(name).get().items():
-            book = book[1]
-            library.update({name:Book(book["name"],book["supervisor"],book["lecture"],date)})
-        if not name == None:
-            try:
-                self.thread_work(lambda : db.storage.blob("books/"+name+".zip").download_to_filename(os.path.join(self.library_path,name+".zip")),True)
-            except : self.setWaiting(True,"Kitabı indirirken bir hata oluştu")
-        self.unzip(book["name"]+".zip")
-        self.db.st_books.update({name:date})
-        self.check_library()
+        if not self.online: return
+        try:
+            name = None
+            for item in db.codes.order_by_child('code').equal_to(code).get().items():
+                name = item[1]["c_book"]
+                date = item[1]["date"]
+            for book in db.books.order_by_child('name').equal_to(name).get().items():
+                book = book[1]
+                library.update({name:Book(book["name"],book["supervisor"],book["lecture"],date)})
+            if not name == None:
+                try:
+                    self.thread_work(lambda : db.storage.blob("books/"+name+".zip").download_to_filename(os.path.join(self.library_path,name+".zip")),True)
+                except : self.setWaiting(True,"Kitabı indirirken bir hata oluştu")
+            self.unzip(book["name"]+".zip")
+            self.db.st_books.update({name:date})
+            self.check_library()
+        except Exception as e:
+            self.setWaiting(True,"Kitap Eklenemedi \n\n\nHATA MESAJO\n\n\n"+ str(e))
     def check_library(self,):
         global library
         while self.tableWidget.rowCount() > 0:
@@ -158,19 +173,21 @@ class MainMenu(QtWidgets.QMainWindow):
             if book.endswith(".zip"): self.unzip(book)
 
 class WaitDialog(QtWidgets.QDialog):
-    def __init__(self):
-        super(WaitDialog, self).__init__()
+    def __init__(self,parent):
+        super(WaitDialog, self).__init__(parent)
         self.lbl = QtWidgets.QLabel(self)
 
         self.lbl.setText("Hatalı E-mail veya Şifre!")
+        self.lbl.setAlignment(QtCore.Qt.AlignCenter)
         self.btn = QtWidgets.QPushButton('Cancel')
         self.btn.setEnabled(True)
         self.btn.clicked.connect(self.close)
         self.setWindowTitle("Hata!")
-        self.resize(400, 200)
+        self.resize(700, 200)
 
     def show_(self, text, title=None):
         self.lbl.setText(text)
+        self.lbl.setAlignment(QtCore.Qt.AlignCenter)
         if title != None:
             self.setWindowTitle(title)
         else:
@@ -179,15 +196,7 @@ class WaitDialog(QtWidgets.QDialog):
 
 class server_signals(QtCore.QObject):
     finished = QtCore.pyqtSignal(object)
-    """
-    error = pyqtSignal(tuple)
-    user_video = pyqtSignal(object)
-    guest_video = pyqtSignal(object)
-    """
-    pass
 class server_worker(QtCore.QRunnable):
-
-    #@pyqtSlot()
     def __init__(self,main):
         super(server_worker, self).__init__()
         self.signals = server_signals()
@@ -205,23 +214,28 @@ class server_worker(QtCore.QRunnable):
             self.flag = False
 if __name__ == "__main__":
     connection = False
+    gate = False
     import sys
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("fusion")
     db = db()
+    menu = MainMenu(connection)
+    db.main = menu
     try:
         if permission(db, "temp") == False:
-            exit()
+            menu.setWaiting(True,"Sunucudan izin alınamadı, lütfen yöneticiye ulaşın : info@ogibalboa.com")
+            gate = True
         connection = True
+        menu.online = True
     except Exception as e:
         print(e)
         if permission_offline() == False:
-            exit()
-    menu = MainMenu(connection)
-    db.main = menu
+            menu.setWaiting(True,"Sunucudan izin alınamadı, lütfen yöneticiye ulaşın : info@ogibalboa.com")
+            gate = True
+
     auth = AuthMenu(menu)
     admin_panel = AdminPanel(menu)
     menu.admin_panel = admin_panel
-    #ui = Auth(mainwin)
     auth.show()
+    if gate: auth.close()
     sys.exit(app.exec_())

@@ -13,6 +13,7 @@ import pyminizip
 import tempfile
 import zipfile
 import os
+
 class AuthMenu(QtWidgets.QMainWindow):
     def __init__(self,main):
         super(AuthMenu, self).__init__()
@@ -40,8 +41,7 @@ class AuthMenu(QtWidgets.QMainWindow):
         self.auth_frame.setHidden(True)
 
     def check_inputs(self, hint=None):
-        if hint == "signin" and self.password_input.text() == "":
-            return True
+
         if hint == "signin" and len(self.password_input.text()) > 5:
             return True
 
@@ -64,12 +64,8 @@ class AuthMenu(QtWidgets.QMainWindow):
 
     def submit(self):
         if self.check_inputs(hint="signin") == False:
+            self.main.setWaiting(True,"Kullanıcı adı veya şifre hatalı ")
             return False
-        elif self.password_input.text() == "":
-            self.main.email = "170216009@gmail.com"
-            self.main.password = "gfb.1907"
-            #self.main.no = "170216009"
-
         else:
             self.main.email = self.username_input.text()
             self.main.password = self.password_input.text()
@@ -79,7 +75,8 @@ class AuthMenu(QtWidgets.QMainWindow):
                 if len(self.main.no) < 9:
                     self.main.setWaiting(True,"Sisteme Kaydınız Bulunamadı ")
                     return
-        except:
+        except Exception as e:
+            print(e)
             if self.main.ofdb.login(self.main.email,self.main.password):
                 self.close()
                 self.main.login_time = datetime.datetime.now()
@@ -131,11 +128,12 @@ class AuthDialog(QtWidgets.QDialog):
         super(AuthDialog, self).__init__()
         self.lbl = QtWidgets.QLabel(self)
         self.lbl.setText("Hatalı E-mail veya Şifre!")
+        self.lbl.setAlignment(QtCore.Qt.AlignCenter)
         self.btn = QtWidgets.QPushButton('Cancel')
         self.btn.setEnabled(True)
         self.btn.clicked.connect(self.close)
         self.setWindowTitle("Hata!")
-        self.resize(250,50)
+        self.resize(700,250)
     def show_(self,text,title = None):
         self.lbl.setText(text)
         if title != None: self.setWindowTitle(title)
@@ -149,18 +147,28 @@ if __name__ == "__main__":
     with zipfile.ZipFile(zip_file) as zf:
         zf.setpassword(password)
         #zf.extractall(pwd=b"abc123")
-    
+    """
     with tempfile.TemporaryDirectory() as tdir:
-        sourceFile = "/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/ogibook.epub"
+        sourceFile = ["/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/marun-bks.json","/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/config.json"]
         destinationFile = "ogibook.zip"
-        password = "nonshallpass"
+        password = "gAAAAABfizzjPLF0CYNvBom-CLWpKGh_CHUqW2dVBZDWyB_M330W4IxiVDNUZhMFbVVdgcGkIKOtxyBWu-eIDYVXsy9TZmnvJw"
         compression_level = 9
-        pyminizip.compress(sourceFile, None, "/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/ogibook.zip", password, compression_level)
-    
+        pyminizip.compress_multiple(sourceFile,["/","/"], "/home/ogibalboa/Desktop/PROJECTS/EBOOK/E-Book_Cryptology/marun-bks.zip", password, compression_level)
+    """
     pw = "pRmgMa8T0INjEAfksaq2aafzoZXEuwKI7wDe4c1F8AY="
     book = zipfile.ZipFile("ogibook.zip").read("ogibook.epub",bytes(pw,"ascii"))
     print(type(book))
-    """
+    
+    key = "5Mm13Gc1iRLy5ukPYRXrwVXYgKLmBFbjPjyVF8ntdCo="
+    #offlinekey = Fernet.generate_key()
+    cipher_suite = Fernet(key)
+    pw = b"gAAAAABfizzjPLF0CYNvBom-CLWpKGh_CHUqW2dVBZDWyB_M330W4IxiVDNUZhMFbVVdgcGkIKOtxyBWu-eIDYVXsy9TZmnvJw"
+    p = b'gAAAAABfiz1Hwe4_ZhkZ_JOivju7-gxkuyDqEv_M4ZniOOW8_FkEiMyoEwuaI4J4YmTKZc6NT6bYHUTBoIpw8meqyx3Gshu6VVRcOCNd28A0k5b2uRqL1yYOYdu7VGNhzq97iQqZUE6iKxar4nqmniGSSimnsQkZb7IbMNOEFouQ6JdiDpfDTGmx7IUXBkT60c_tZk0ZKfUw4OYlRvjwfXQ8aeF4H1YOmg=='
 
+    #uncipher_text = (cipher_suite.decrypt(pw))
+    password = cipher_suite.decrypt(p)
+    print(password)
+    #plain_text_encryptedpassword = bytes(uncipher_text).decode("utf-8")  # convert to string
+    """
     pass
 
