@@ -65,7 +65,9 @@ class db:
 		zip_path = os.path.join(path,zip_name)
 		#print(name,"\n",zip_name,"\n",path,"\n",zip_path)
 		pyminizip.compress(book_path, None, zip_path ,self.unzip_key, 1)
-		self.storage.blob("books/"+zip_name).upload_from_filename(zip_path)
+		blob = self.storage.blob("books/"+zip_name)
+		blob._chunk_size = 1024*1024
+		blob.upload_from_filename(zip_path)
 		return True
 	def checkDocuments(self):
 		self.documents_path = os.path.join(os.path.expanduser("~"), ".marun_bks")

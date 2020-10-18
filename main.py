@@ -147,11 +147,17 @@ class MainMenu(QtWidgets.QMainWindow):
     def setWaiting(self,status: bool,text = "İşlem Sürüyor Lütfen Bekleyiniz..."):
         if status == True:
             self.dlg.show_(text,"Bir dakika !")
+        elif status == None:
+            self.dlg.show(self.error_message,)
         else:
             self.dlg.close()
+    def errormessage(self,error):
+        self.error_message = str(error)
     def thread_work (self,func,dlg = None,hint = None):
         worker = server_worker(self)
-        if dlg: worker.signals.finished.connect(self.setWaiting)
+        if dlg:
+            worker.signals.finished.connect(self.setWaiting)
+            worker.signals.error.connect(self.errormessage)
         if hint == "unzip": worker.signals.finished.connect(self.flag_)
         worker.func = func
         self.threadpool.start(worker)
@@ -196,6 +202,7 @@ class WaitDialog(QtWidgets.QDialog):
 
 class server_signals(QtCore.QObject):
     finished = QtCore.pyqtSignal(object)
+    error = QtCore.pyqtSignal(object)
 class server_worker(QtCore.QRunnable):
     def __init__(self,main):
         super(server_worker, self).__init__()
@@ -209,9 +216,15 @@ class server_worker(QtCore.QRunnable):
         else:
             self.flag = True
             self.signals.finished.emit(True)
-            if not self.func == None: self.func()
-            self.signals.finished.emit(False)
-            self.flag = False
+            try:
+                if not self.func == None: self.func()
+                self.signals.finished.emit(False)
+                self.flag = False
+            except ConnectionError as e:
+                self.signals.finished.emit(None)
+                self.signals.error.emit("Yükleme sırasında bir sorun oluştu, lütfen geliştiriciye ulaşın: info@ogibalboa.com"
+                                           "\n\nHATA MESAHI\n\n"+ str(e))
+
 if __name__ == "__main__":
     connection = False
     gate = False
